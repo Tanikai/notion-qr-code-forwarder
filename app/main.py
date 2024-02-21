@@ -10,9 +10,10 @@ import logging
 
 logger = logging.getLogger("uvicorn")
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    #startup
+    # startup
     forwarder = get_notion_forwarder()
     await forwarder.populate_config()
     logger.info("Populated Configuration")
@@ -20,20 +21,23 @@ async def lifespan(app: FastAPI):
     # cleanup
     # (currently none)
 
+
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(redirect.router, prefix="/r")
 
 app.add_middleware(
-CORSMiddleware,
+    CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "root path"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

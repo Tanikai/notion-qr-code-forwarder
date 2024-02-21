@@ -4,7 +4,7 @@ from typing import List, Dict
 import asyncio
 
 from ..config import DatabaseConfig, configuration
-from ..model.mappings import ForwardedDatabase, ForwardMapping, ForwardUrls
+from ..model.mappings import ForwardedDatabase, ForwardUrls
 import logging
 
 config = configuration
@@ -18,7 +18,7 @@ def plain_from_rich_object(rich_text: dict):
 
 
 async def populate_database(
-    db: DatabaseConfig, notion_client: AsyncClient
+        db: DatabaseConfig, notion_client: AsyncClient
 ) -> ForwardedDatabase:
     f_db = ForwardedDatabase(
         name=db.name,
@@ -28,7 +28,7 @@ async def populate_database(
     )
 
     async for item in async_iterate_paginated_api(
-        notion_client.databases.query, database_id=f_db.database_id
+            notion_client.databases.query, database_id=f_db.database_id
     ):
         properties = item["properties"]
 
@@ -44,21 +44,21 @@ async def populate_database(
 
 
 async def populate_forwarded_databases(
-    databases: List[DatabaseConfig], notion_client: AsyncClient
+        databases: List[DatabaseConfig], notion_client: AsyncClient
 ) -> List[ForwardedDatabase]:
     tasks = []
     for db in databases:
         task = populate_database(db, notion_client)
         tasks.append(task)
 
-    return await asyncio.gather(*tasks)
+    return list(asyncio.gather(*tasks))
 
 
 class NotionForwarder:
     def __init__(self, client: AsyncClient):
         self.client = client
         self.database_config = config.databases
-        self.forwardings: Dict[str, ForwardedDatabase] = None
+        self.forwardings: Dict[str, ForwardedDatabase] = {}
 
     async def populate_config(self):
         logger.info("Populating forwarding config...")
