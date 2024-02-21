@@ -20,14 +20,14 @@ class Configuration(BaseModel):
 
 
 class EnvFile(BaseSettings):
-    config_path: str = "./config.json"
+    NFWD_CONFIG_PATH: str = "./config.json"
 
 
 env_file = EnvFile()
 
 
 def get_config():
-    with open(env_file.config_path) as f:
+    with open(env_file.NFWD_CONFIG_PATH) as f:
         json_file = json.load(f)
         return Configuration(**json_file)
 
