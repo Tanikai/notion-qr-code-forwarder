@@ -6,17 +6,25 @@ from contextlib import asynccontextmanager
 # Middlewares
 from fastapi.middleware.cors import CORSMiddleware
 from .dependencies.notion import get_notion_forwarder
+from .config import get_configuration
 import logging
 
 logger = logging.getLogger("uvicorn")
+
+config = get_configuration()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
     forwarder = get_notion_forwarder()
-    await forwarder.populate_config()
-    logger.info("Populated Configuration")
+    if config.lazy_load:
+        logger.info("Lazy loading enabled, skipping Configuration Population")
+        await forwarder.create_databases(populate=False)
+    else:
+        await forwarder.create_databases(populate=True)
+        logger.info("Populated Configuration")
+
     yield
     # cleanup
     # (currently none)

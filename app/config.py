@@ -26,10 +26,14 @@ class EnvFile(BaseSettings):
 env_file = EnvFile()
 
 
-def get_config():
+def _load_config():
     with open(env_file.NFWD_CONFIG_PATH) as f:
         json_file = json.load(f)
         return Configuration(**json_file)
 
 
-configuration = get_config()
+configuration = _load_config()
+
+
+def get_configuration():
+    return configuration
